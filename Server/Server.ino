@@ -17,6 +17,7 @@ ESP8266WebServer server(80);
 void setup() {
   Serial.begin(115200);
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   WiFi.softAP(ssid, password);
   WiFi.softAPConfig(local_ip, gateway, subnet);
@@ -30,7 +31,7 @@ void setup() {
 }
 
 int gotRequest = HIGH;
-int locked = 0;
+int locked = 1;
 void loop() {
   gotRequest = HIGH;
   server.handleClient();

@@ -22,6 +22,7 @@ void setup() {
 
   Serial.begin(115200);
   pinMode(RELAY_PIN, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   // Serial.setDebugOutput(true);
 
   Serial.println();
@@ -64,10 +65,10 @@ void loop() {
         if (httpCode == HTTP_CODE_OK) {
           String payload = http.getString();
           if (payload == "locked") {
-            digitalWrite(LED_BUILTIN, LOW);
+            digitalWrite(LED_BUILTIN, HIGH);
             digitalWrite(RELAY_PIN, LOW);
           } else {
-            digitalWrite(LED_BUILTIN, HIGH);
+            digitalWrite(LED_BUILTIN, LOW);
             digitalWrite(RELAY_PIN, HIGH);
           }
           Serial.printf("%s\n", payload);
