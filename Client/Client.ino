@@ -18,6 +18,10 @@ ESP8266WiFiMulti WiFiMulti;
 
 const int RELAY_PIN = 5;
 
+const char wireless_ssid[] = "24-25-UNC-PSK";
+const char wireless_pass[] = "DeepSenseOfService";
+byte mac[6];
+
 void setup() {
 
   Serial.begin(115200);
@@ -36,8 +40,21 @@ void setup() {
   }
 
   WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP("DoorControl", "cteadmin");
+  WiFiMulti.addAP(wireless_ssid, wireless_pass);
 
+  WiFi.macAddress(mac);
+  Serial.print("MAC: ");
+  Serial.print(mac[5], HEX);
+  Serial.print(":");
+  Serial.print(mac[4], HEX);
+  Serial.print(":");
+  Serial.print(mac[3], HEX);
+  Serial.print(":");
+  Serial.print(mac[2], HEX);
+  Serial.print(":");
+  Serial.print(mac[1], HEX);
+  Serial.print(":");
+  Serial.println(mac[0], HEX);
 }
 
 void loop() {
@@ -49,7 +66,7 @@ void loop() {
     HTTPClient http;
 
     Serial.print("[HTTP] begin...\n");
-    if (http.begin(client, "http://192.168.1.1/")) {  // HTTP
+    if (http.begin(client, "http://tmo.chapelthrillescapes.com/api/transition/door_open")) {  // HTTP
 
 
       Serial.print("[HTTP] GET...\n");
@@ -64,7 +81,7 @@ void loop() {
         // file found at server
         if (httpCode == HTTP_CODE_OK) {
           String payload = http.getString();
-          if (payload == "locked") {
+          if (payload == "false") {
             digitalWrite(LED_BUILTIN, HIGH);
             digitalWrite(RELAY_PIN, LOW);
           } else {
@@ -83,5 +100,5 @@ void loop() {
     }
   }
 
-  delay(100);
+  delay(1000);
 }
