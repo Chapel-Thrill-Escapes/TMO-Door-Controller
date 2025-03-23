@@ -11,6 +11,9 @@
 #include <ESP8266WiFiMulti.h>
 
 #include <ESP8266HTTPClient.h>
+#include <WiFiClientSecureBearSSL.h>
+
+#include "certs.h"
 
 #include <WiFiClient.h>
 
@@ -61,12 +64,17 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    WiFiClient client;
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+
+    //client->setFingerprint(fingerprint_sni_cloudflaressl_com);
+    // Or, if you happy to ignore the SSL certificate, then use the following line instead:
+    client->setInsecure();
+
 
     HTTPClient http;
 
     Serial.print("[HTTP] begin...\n");
-    if (http.begin(client, "http://tmo.chapelthrillescapes.com/api/transition/door_open")) {  // HTTP
+    if (http.begin(*client, "https://tmo.chapelthrillescapes.com/api/player/transition/door_open")) {  // HTTP
 
 
       Serial.print("[HTTP] GET...\n");
@@ -82,6 +90,7 @@ void loop() {
         if (httpCode == HTTP_CODE_OK) {
           String payload = http.getString();
           if (payload == "false") {
+            Serial.printf("Locking");
             digitalWrite(LED_BUILTIN, HIGH);
             digitalWrite(RELAY_PIN, LOW);
           } else {
